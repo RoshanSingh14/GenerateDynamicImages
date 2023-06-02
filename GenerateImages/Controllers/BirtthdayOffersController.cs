@@ -79,7 +79,7 @@ namespace GenerateImages.Controllers
                         float y = (bitmap.Height - paint.TextSize) / 2;
 
                         canvas.DrawText("Offer Valid For", x - 25, y - 45, paint);
-                        canvas.DrawText(remainingTime.ToString(@"dd\.hh\:mm\:ss"), x, y, paint);
+                        canvas.DrawText(remainingTime.ToString(@"dd\:hh\:mm\:ss"), x, y, paint);
 
                     }
 

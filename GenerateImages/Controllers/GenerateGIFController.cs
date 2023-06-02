@@ -9,15 +9,27 @@ namespace ImageGenerationAPI.Controllers
         [Route("GetNumbers")]
         public IActionResult GenerateImage()
         {
-            MagickImageCollection collection = new MagickImageCollection();
+            // Convert string dateofbirth to datetime.
+            DateTime dateOfBirth = new DateTime(2023, 06, 01);
 
-            for (int i = 1; i <= 59; i++)
+            DateTime currentDate = DateTime.Now;
+
+            // Add 7 Days to Birthdate For Valid Offer.
+            DateTime validDate = dateOfBirth.AddDays(7);
+
+            // TO Set the Timer that how many TimeSpan is remaning for Offer.
+            TimeSpan remainingTime = validDate - currentDate;
+
+            // TO Store GIF
+            MagickImageCollection imageCollection = new MagickImageCollection();
+
+            for (int seconds = 59; seconds >= 0; seconds--)
             {
                 MagickImage image = new MagickImage(MagickColors.White, 200, 200);
 
-                using (MagickImage caption = new MagickImage($"label:{i}", new MagickReadSettings
+                using (MagickImage caption = new MagickImage($"label:{remainingTime.ToString("dd\\:hh\\:mm")}:{seconds:00}", new MagickReadSettings
+                // using (MagickImage caption = new MagickImage($"label:days\nminutes\nseconds\n{remainingTime.Days:00}:{remainingTime.Hours:00}:{remainingTime.Minutes:00}:{seconds:00}", new MagickReadSettings
                 {
-
                     Width = 200,
                     Height = 50,
                     FillColor = MagickColors.Black,
@@ -26,23 +38,23 @@ namespace ImageGenerationAPI.Controllers
                 {
                     image.Composite(caption, Gravity.Center);
                 }
-
-                collection.Add(image);
+                imageCollection.Add(image);
             }
 
-            foreach (var frame in collection)
+            foreach (var frame in imageCollection)
             {
-                // Set the 1 Second Delay.
-                frame.AnimationDelay = 100; 
+                // Set the 1 second Delay in FrameDelay
+                frame.AnimationDelay = 100;
             }
 
-            collection.Quantize(new QuantizeSettings { Colors = 256 }); 
+            imageCollection.Quantize(new QuantizeSettings { Colors = 256 });
 
-            var stream = new MemoryStream();
-            collection.Write(stream, MagickFormat.Gif);
-            stream.Position = 0;
+            var memoryStream = new MemoryStream();
+            imageCollection.Write(memoryStream, MagickFormat.Gif);
+            memoryStream.Position = 0;
 
-            return File(stream, "image/gif");
+            return File(memoryStream, "image/gif");
         }
+
     }
 }
